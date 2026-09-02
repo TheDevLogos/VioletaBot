@@ -1,0 +1,2 @@
+import {NextResponse} from 'next/server';import {createSupabaseServerClient} from '@/lib/supabase/server';
+export async function POST(req:Request){const fd=await req.formData();const email=String(fd.get('email')||'');const password=String(fd.get('password')||'');const supabase=await createSupabaseServerClient();const {error}=await supabase.auth.signInWithPassword({email,password});if(error)return NextResponse.redirect(new URL('/admin/login?error=1',req.url),303);return NextResponse.redirect(new URL('/admin/casos',req.url),303)}
