@@ -1,0 +1,13 @@
+# Vercel > Project > Settings > Environment Variables
+# DO NOT commit real values.
+
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-5.6-luna
+
+META_GRAPH_VERSION=v26.0
+WHATSAPP_VERIFY_TOKEN=generate-a-long-random-secret
+WHATSAPP_ACCESS_TOKEN=store-the-meta-token-here
+META_APP_SECRET=store-the-meta-app-secret-here
+
+# Optional legacy fallback only:
+WHATSAPP_PHONE_NUMBER_ID=
