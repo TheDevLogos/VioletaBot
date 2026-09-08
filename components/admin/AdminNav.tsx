@@ -38,6 +38,10 @@ export function AdminNav({
           Canalizaciones
         </Link>
 
+        <Link href="/admin/analitica">
+          Analítica
+        </Link>
+
         <Link href="/admin/terapeutas">
           Red de terapeutas
         </Link>

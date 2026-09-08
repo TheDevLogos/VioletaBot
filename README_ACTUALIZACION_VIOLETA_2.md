@@ -85,3 +85,72 @@ Este modelo evita obligar a terapeutas independientes a aprender el Centro compl
 - El contacto de la víctima no se comparte con terapeuta sin consentimiento.
 - No se automatiza despacho policial.
 - Las notas de canalización son operativas; no deben convertirse en historia clínica.
+
+
+---
+
+# VioletaBot 3.0 — Analítica Preventiva
+
+Esta carpeta incorpora además:
+
+- `/admin/analitica`
+- ficha estadística estructurada por expediente
+- series diaria/semanal/mensual/anual
+- KPIs de violencia, angustia y autolesión
+- tiempos de respuesta y canalización
+- distribución por hora/día
+- tipologías de violencia
+- edad por rangos
+- relación con probable agresor
+- rutas de atención
+- necesidades de servicio
+- analítica de acciones de operadores
+- mapa de calor por celdas agregadas
+- colonias/zonas con umbral de privacidad
+- exportación CSV agregada
+
+## Supabase
+
+La migración:
+
+`supabase/migrations/005_preventive_analytics.sql`
+
+YA fue aplicada al proyecto piloto conectado.
+
+No la vuelvas a ejecutar manualmente en el mismo proyecto.
+
+La tabla nueva es:
+
+`case_profiles`
+
+También se agregaron a `organizations`:
+
+- `analytics_enabled`
+- `analytics_min_geo_group_size`
+
+El umbral territorial inicial es 5 casos.
+
+## Nuevas rutas
+
+- `/admin/analitica`
+- `/api/admin/cases/[id]/profile`
+- `/api/admin/analytics/export`
+
+## Archivos nuevos de analítica
+
+- `lib/analytics/aggregate.ts`
+- `components/admin/analytics/Charts.tsx`
+- `app/admin/analitica/page.tsx`
+- `app/api/admin/analytics/export/route.ts`
+- `app/api/admin/cases/[id]/profile/route.ts`
+- `supabase/migrations/005_preventive_analytics.sql`
+- `docs/MODULO_ANALITICA_PREVENTIVA.md`
+
+## Archivos modificados
+
+- `components/admin/AdminNav.tsx`
+- `app/admin/centro/page.tsx`
+- `app/admin/casos/[id]/page.tsx`
+- `app/admin/operation.css`
+- `app/page.tsx`
+

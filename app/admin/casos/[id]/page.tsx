@@ -19,6 +19,30 @@ function selfBadge(level?: string) {
   return `opBadge op-self-${level || 'none'}`;
 }
 
+const statisticalViolenceTypes = [
+  ['psychological', 'Psicológica'],
+  ['economic', 'Económica'],
+  ['social', 'Social / aislamiento'],
+  ['sexual', 'Sexual'],
+  ['physical', 'Física'],
+  ['digital', 'Digital'],
+  ['patrimonial', 'Patrimonial'],
+  ['threats', 'Amenazas / miedo'],
+  ['coercive_control', 'Control coercitivo'],
+] as const;
+
+const statisticalServiceNeeds = [
+  ['emotional_support', 'Contención / apoyo emocional'],
+  ['psychological', 'Atención psicológica'],
+  ['legal', 'Orientación jurídica'],
+  ['medical', 'Atención médica'],
+  ['social_support', 'Apoyo social'],
+  ['shelter', 'Refugio / espacio seguro'],
+  ['safety_planning', 'Plan de seguridad'],
+  ['authority_orientation', 'Orientación institucional'],
+  ['other', 'Otro'],
+] as const;
+
 export default async function CaseDetail({
   params,
 }: {
@@ -58,6 +82,7 @@ export default async function CaseDetail({
     referralsResult,
     referralEventsResult,
     consentsResult,
+    caseProfileResult,
   ] = await Promise.all([
     db
       .from('organizations')
@@ -151,6 +176,12 @@ export default async function CaseDetail({
       .order('created_at', {
         ascending: false,
       }),
+
+    db
+      .from('case_profiles')
+      .select('*')
+      .eq('conversation_id', id)
+      .maybeSingle(),
   ]);
 
   const org = orgResult.data;
@@ -169,6 +200,8 @@ export default async function CaseDetail({
     referralsResult.data || [];
   const consents =
     consentsResult.data || [];
+  const caseProfile =
+    caseProfileResult.data || null;
 
   const referralIds = new Set(
     referrals.map(
@@ -353,6 +386,323 @@ export default async function CaseDetail({
             </Link>
           </div>
         )}
+
+        <section className="opPanel" id="estadistica">
+          <div className="opSectionTitle">
+            <div>
+              <h2>Ficha estadística preventiva</h2>
+              <p className="opMuted">
+                Información estructurada y opcional para análisis agregado, planeación preventiva y evaluación institucional.
+              </p>
+            </div>
+
+            <Link
+              className="opBtn secondary"
+              href="/admin/analitica"
+            >
+              Abrir Analítica
+            </Link>
+          </div>
+
+          <div className="anDataMinNotice">
+            <strong>Minimización de datos:</strong>{' '}
+            registra solo información útil para atención y política pública. No captures domicilio, fecha de nacimiento, religión, orientación sexual, etnia, contraseñas ni datos clínicos detallados en esta ficha.
+          </div>
+
+          <form
+            action={`/api/admin/cases/${id}/profile`}
+            method="post"
+            className="anProfileForm"
+          >
+            <div>
+              <label className="opLabel">
+                Rango de edad
+              </label>
+              <select
+                className="opSelect"
+                name="age_band"
+                defaultValue={
+                  caseProfile?.age_band || 'unknown'
+                }
+              >
+                <option value="unknown">Sin dato</option>
+                <option value="under_18">Menor de 18</option>
+                <option value="18_24">18–24</option>
+                <option value="25_34">25–34</option>
+                <option value="35_44">35–44</option>
+                <option value="45_54">45–54</option>
+                <option value="55_64">55–64</option>
+                <option value="65_plus">65+</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="opLabel">
+                Colonia
+              </label>
+              <input
+                className="opInput"
+                name="neighborhood"
+                maxLength={120}
+                defaultValue={
+                  caseProfile?.neighborhood || ''
+                }
+                placeholder="Ej. Centro, Lotes Urbanos..."
+              />
+            </div>
+
+            <div>
+              <label className="opLabel">
+                Zona / sector
+              </label>
+              <input
+                className="opInput"
+                name="zone"
+                maxLength={120}
+                defaultValue={
+                  caseProfile?.zone || ''
+                }
+                placeholder="Ej. Norte, Centro, Sur..."
+              />
+            </div>
+
+            <div>
+              <label className="opLabel">
+                Localidad
+              </label>
+              <input
+                className="opInput"
+                name="locality"
+                maxLength={120}
+                defaultValue={
+                  caseProfile?.locality || ''
+                }
+                placeholder="Ej. Delicias"
+              />
+            </div>
+
+            <div>
+              <label className="opLabel">
+                Relación con probable agresor
+              </label>
+              <select
+                className="opSelect"
+                name="relationship_to_aggressor"
+                defaultValue={
+                  caseProfile?.relationship_to_aggressor ||
+                  'unknown'
+                }
+              >
+                <option value="unknown">Sin dato</option>
+                <option value="partner">Pareja</option>
+                <option value="ex_partner">Expareja</option>
+                <option value="family">Familiar</option>
+                <option value="acquaintance">Conocido</option>
+                <option value="work">Entorno laboral</option>
+                <option value="community">Entorno comunitario</option>
+                <option value="other">Otro</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="opLabel">
+                Patrón de recurrencia
+              </label>
+              <select
+                className="opSelect"
+                name="recurrence_pattern"
+                defaultValue={
+                  caseProfile?.recurrence_pattern ||
+                  'unknown'
+                }
+              >
+                <option value="unknown">Sin dato</option>
+                <option value="first_reported_episode">
+                  Primer episodio reportado
+                </option>
+                <option value="occasional">Ocasional</option>
+                <option value="repeated">Repetido</option>
+                <option value="escalating">
+                  En aumento / escalamiento
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label className="opLabel">
+                ¿Vive con el probable agresor?
+              </label>
+              <select
+                className="opSelect"
+                name="cohabitation_status"
+                defaultValue={
+                  caseProfile?.cohabitation_status ||
+                  'unknown'
+                }
+              >
+                <option value="unknown">Sin dato</option>
+                <option value="yes">Sí</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="opLabel">
+                ¿Hay menores presentes o involucrados?
+              </label>
+              <select
+                className="opSelect"
+                name="minors_present"
+                defaultValue={
+                  caseProfile?.minors_present || 'unknown'
+                }
+              >
+                <option value="unknown">Sin dato</option>
+                <option value="yes">Sí</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="opLabel">
+                ¿Existe reporte/atención previa conocida?
+              </label>
+              <select
+                className="opSelect"
+                name="previous_report"
+                defaultValue={
+                  caseProfile?.previous_report || 'unknown'
+                }
+              >
+                <option value="unknown">Sin dato</option>
+                <option value="yes">Sí</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="opLabel">
+                Resultado / ruta actual
+              </label>
+              <select
+                className="opSelect"
+                name="case_outcome"
+                defaultValue={
+                  caseProfile?.case_outcome || 'open'
+                }
+              >
+                <option value="open">Abierto</option>
+                <option value="orientation">Orientación</option>
+                <option value="therapy_referral">
+                  Canalización terapéutica
+                </option>
+                <option value="legal_referral">
+                  Canalización jurídica
+                </option>
+                <option value="medical_referral">
+                  Canalización médica
+                </option>
+                <option value="authority_referral">
+                  Canalización institucional
+                </option>
+                <option value="safety_plan">
+                  Plan de seguridad
+                </option>
+                <option value="unreachable">
+                  Sin contacto
+                </option>
+                <option value="closed">Cerrado</option>
+                <option value="other">Otro</option>
+              </select>
+            </div>
+
+            <fieldset className="anFieldset anFull">
+              <legend>Tipos de violencia observados o reportados</legend>
+              <div className="anCheckGrid">
+                {statisticalViolenceTypes.map(
+                  ([value, label]) => (
+                    <label key={value}>
+                      <input
+                        type="checkbox"
+                        name="violence_types"
+                        value={value}
+                        defaultChecked={(
+                          caseProfile?.violence_types || []
+                        ).includes(value)}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  )
+                )}
+              </div>
+            </fieldset>
+
+            <fieldset className="anFieldset anFull">
+              <legend>Necesidades / servicios identificados</legend>
+              <div className="anCheckGrid">
+                {statisticalServiceNeeds.map(
+                  ([value, label]) => (
+                    <label key={value}>
+                      <input
+                        type="checkbox"
+                        name="service_needs"
+                        value={value}
+                        defaultChecked={(
+                          caseProfile?.service_needs || []
+                        ).includes(value)}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  )
+                )}
+              </div>
+            </fieldset>
+
+            <label className="anFollowup anFull">
+              <input
+                type="checkbox"
+                name="follow_up_required"
+                value="yes"
+                defaultChecked={
+                  caseProfile?.follow_up_required === true
+                }
+              />
+              <span>
+                Requiere seguimiento posterior
+              </span>
+            </label>
+
+            <div className="anFull">
+              <label className="opLabel">
+                Nota estadística breve
+              </label>
+              <textarea
+                className="opTextarea"
+                name="statistical_notes"
+                maxLength={2000}
+                defaultValue={
+                  caseProfile?.statistical_notes || ''
+                }
+                placeholder="Contexto operativo útil para clasificación estadística. Evita transcribir información clínica o íntima innecesaria."
+              />
+            </div>
+
+            <div className="anFull opActions">
+              <button className="opBtn">
+                Guardar ficha estadística
+              </button>
+
+              <span className="opMeta">
+                Última actualización:{' '}
+                {caseProfile?.updated_at
+                  ? new Date(
+                      caseProfile.updated_at
+                    ).toLocaleString('es-MX')
+                  : 'Sin captura'}
+              </span>
+            </div>
+          </form>
+        </section>
 
         <div className="opTwo">
           <section>

@@ -29,6 +29,11 @@ const capabilities = [
     text:
       'Operadoras visualizan violencia, estado emocional, alertas, notas, canalizaciones, disponibilidad de terapeutas y seguimiento en una sola pantalla.',
   },
+  {
+    title: 'Analítica preventiva',
+    text:
+      'Convierte registros operativos en estadísticas diarias, semanales, mensuales y anuales para identificar patrones agregados, tiempos de atención y concentraciones territoriales sin exponer ubicaciones individuales.',
+  },
 ];
 
 const flow = [
@@ -360,6 +365,12 @@ export default function Home() {
                 </span>
                 <span>
                   Seguimiento y cierre
+                </span>
+                <span>
+                  Analítica preventiva
+                </span>
+                <span>
+                  Mapas agregados por zona
                 </span>
               </div>
             </div>

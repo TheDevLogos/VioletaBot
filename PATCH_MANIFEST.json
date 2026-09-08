@@ -1,0 +1,19 @@
+{
+  "package": "VioletaBot 3.0.1 definitive consistency patch",
+  "base_verified_commit": "18a4ad3",
+  "preserve_exactly_as_current": [
+    "lib/analytics/aggregate.ts"
+  ],
+  "replace_only": [
+    "README_ACTUALIZACION_VIOLETA_2.md",
+    "UPDATE_MANIFEST.json",
+    "app/admin/casos/[id]/page.tsx",
+    "app/admin/centro/page.tsx",
+    "app/admin/operation.css",
+    "app/page.tsx",
+    "components/admin/AdminNav.tsx",
+    "docs/PLAN_DE_PRUEBAS_VIOLETA_2.md"
+  ],
+  "do_not_delete_other_repository_files": true,
+  "purpose": "Restore V3 interface and documentation while preserving the TypeScript hotfix already deployed successfully."
+}

@@ -132,3 +132,62 @@ Si Meta falla:
 - delivery_status failed;
 - failed_at;
 - log `[violeta:delivery.failed]`.
+
+
+---
+
+# Pruebas del módulo de Analítica Preventiva
+
+## Ficha estadística
+
+1. Abrir un expediente real o de prueba.
+2. Completar rango de edad, colonia, vínculo, tipos de violencia y necesidades.
+3. Guardar.
+4. Recargar expediente.
+
+Esperado:
+- los valores permanecen;
+- existe una fila en `case_profiles`;
+- `audit_logs` registra `case.statistical_profile_updated`.
+
+## Dashboard
+
+Abrir `/admin/analitica`.
+
+Esperado:
+- simulaciones excluidas;
+- selector Hoy/Semana/Mes/Año/Histórico;
+- KPIs;
+- serie temporal;
+- distribuciones;
+- embudo de canalización;
+- horario;
+- ficha estadística;
+- analítica de operación.
+
+## Privacidad territorial
+
+Con menos de `analytics_min_geo_group_size` casos en una colonia/celda:
+
+Esperado:
+- el área no aparece;
+- se muestra aviso de supresión.
+
+Con un grupo igual o superior al umbral:
+
+Esperado:
+- aparece agregado;
+- nunca aparecen puntos individuales.
+
+## CSV
+
+- `/api/admin/analytics/export?period=month&dataset=daily`
+- `/api/admin/analytics/export?period=month&dataset=areas`
+
+Esperado:
+- CSV agregado;
+- sin teléfono;
+- sin mensaje;
+- sin coordenada individual;
+- áreas pequeñas excluidas.
+
