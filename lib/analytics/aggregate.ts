@@ -157,7 +157,7 @@ export function localWeekDay(
 }
 
 export function countBy(
-  values: Array<string | null | undefined>,
+  values: Array<unknown>,
   emptyLabel = 'Sin dato'
 ): NamedCount[] {
   const map = new Map<
@@ -190,7 +190,7 @@ export function countBy(
 
 export function countArrayValues(
   arrays: Array<
-    string[] | null | undefined
+    ReadonlyArray<unknown> | null | undefined
   >
 ): NamedCount[] {
   const map = new Map<
@@ -199,7 +199,7 @@ export function countArrayValues(
   >();
 
   for (const values of arrays) {
-    const unique = new Set(
+    const unique = new Set<string>(
       (values || [])
         .map((item) =>
           String(item).trim()
