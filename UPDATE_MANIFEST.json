@@ -1,0 +1,79 @@
+{
+  "version": "VioletaBot 3.0 - Analitica Preventiva",
+  "base_version": "VioletaBot 2.0 Care Network",
+  "database": {
+    "migration": "005_preventive_analytics.sql",
+    "applied_to_connected_pilot": true,
+    "new_table": "case_profiles",
+    "organization_settings": [
+      "analytics_enabled",
+      "analytics_min_geo_group_size"
+    ],
+    "geo_privacy_threshold_pilot": 5
+  },
+  "new_routes": [
+    "/admin/analitica",
+    "/api/admin/analytics/export",
+    "/api/admin/cases/[id]/profile"
+  ],
+  "new_capabilities": [
+    "daily_weekly_monthly_yearly_statistics",
+    "preventive_analytics_dashboard",
+    "structured_case_profile",
+    "risk_distress_self_harm_statistics",
+    "referral_funnel",
+    "response_time_metrics",
+    "operator_activity_metrics",
+    "coarse_geo_heatmap",
+    "privacy_thresholded_neighborhood_statistics",
+    "aggregated_csv_exports"
+  ],
+  "tests": {
+    "typescript_strict": "PASS",
+    "aggregate_helpers": "PASS",
+    "geo_privacy_threshold": "PASS",
+    "area_privacy_threshold": "PASS",
+    "median_metrics": "PASS",
+    "period_filters": "PASS",
+    "supabase_case_profiles_schema": "PASS",
+    "supabase_rls": "PASS",
+    "pilot_geo_threshold": 5
+  },
+  "files": [
+    "INSTRUCCIONES_DESPLIEGUE_ANALITICA_V3.md",
+    "README_ACTUALIZACION_VIOLETA_2.md",
+    "UPDATE_MANIFEST.json",
+    "app/admin/analitica/page.tsx",
+    "app/admin/canalizaciones/page.tsx",
+    "app/admin/casos/[id]/page.tsx",
+    "app/admin/centro/page.tsx",
+    "app/admin/operation.css",
+    "app/admin/simulador/SimulatorClient.tsx",
+    "app/admin/terapeutas/page.tsx",
+    "app/api/admin/analytics/export/route.ts",
+    "app/api/admin/cases/[id]/profile/route.ts",
+    "app/api/admin/referrals/[id]/assign/route.ts",
+    "app/api/admin/referrals/[id]/status/route.ts",
+    "app/api/admin/therapists/[id]/availability/route.ts",
+    "app/api/admin/therapists/create/route.ts",
+    "app/api/simulator/message/route.ts",
+    "app/api/webhooks/whatsapp/route.ts",
+    "app/globals.css",
+    "app/page.tsx",
+    "components/admin/AdminNav.tsx",
+    "components/admin/LiveRefresh.tsx",
+    "components/admin/analytics/Charts.tsx",
+    "docs/MODULO_ANALITICA_PREVENTIVA.md",
+    "docs/PLAN_DE_PRUEBAS_VIOLETA_2.md",
+    "docs/PROTOCOLO_OPERATIVO_RED_TERAPEUTAS.md",
+    "lib/analytics/aggregate.ts",
+    "lib/bot/triage.ts",
+    "lib/bot/violeta.ts",
+    "lib/care/decisions.ts",
+    "lib/risk/distress.ts",
+    "lib/whatsapp/phone.ts",
+    "lib/whatsapp/send.ts",
+    "supabase/migrations/004_care_network_and_emotional_triage.sql",
+    "supabase/migrations/005_preventive_analytics.sql"
+  ]
+}

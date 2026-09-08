@@ -1,5 +1,7 @@
+import { normalizeWhatsAppRecipient } from '@/lib/whatsapp/phone';
+
 function graphVersion() {
-  return process.env.META_GRAPH_VERSION || 'v26.0';
+  return process.env.META_GRAPH_VERSION || 'v25.0';
 }
 
 function whatsappToken() {
@@ -12,23 +14,11 @@ function whatsappToken() {
   return token;
 }
 
-function normalizeWhatsAppRecipient(value: string) {
-  const digits = value.replace(/\D/g, '');
-
-  // WhatsApp puede entregar números mexicanos como 521XXXXXXXXXX,
-  // mientras Cloud API espera actualmente 52XXXXXXXXXX.
-  if (/^521\d{10}$/.test(digits)) {
-    return `52${digits.slice(3)}`;
-  }
-
-  return digits;
-}
-
 async function graphPost(
   phoneNumberId: string,
   payload: unknown
 ) {
-  const r = await fetch(
+  const response = await fetch(
     `https://graph.facebook.com/${graphVersion()}/${phoneNumberId}/messages`,
     {
       method: 'POST',
@@ -40,15 +30,22 @@ async function graphPost(
     }
   );
 
-  const data = await r.json().catch(() => ({}));
+  const data = await response
+    .json()
+    .catch(() => ({}));
 
-  if (!r.ok) {
+  if (!response.ok) {
     throw new Error(
-      `WhatsApp error ${r.status}: ${JSON.stringify(data).slice(0, 500)}`
+      `WhatsApp error ${response.status}: ${JSON.stringify(data).slice(0, 700)}`
     );
   }
 
   return data;
+}
+
+export function providerMessageId(response: any) {
+  const id = response?.messages?.[0]?.id;
+  return typeof id === 'string' ? id : null;
 }
 
 export async function sendWhatsApp(
@@ -77,6 +74,45 @@ export async function sendWhatsApp(
     text: {
       preview_url: false,
       body: body.slice(0, 4096),
+    },
+  });
+}
+
+export async function sendReplyButtons(args: {
+  to: string;
+  phoneNumberId: string;
+  body: string;
+  buttons: Array<{
+    id: string;
+    title: string;
+  }>;
+}) {
+  const recipient =
+    normalizeWhatsAppRecipient(args.to);
+
+  const buttons = args.buttons
+    .slice(0, 3)
+    .map((button) => ({
+      type: 'reply',
+      reply: {
+        id: button.id.slice(0, 256),
+        title: button.title.slice(0, 20),
+      },
+    }));
+
+  return graphPost(args.phoneNumberId, {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to: recipient,
+    type: 'interactive',
+    interactive: {
+      type: 'button',
+      body: {
+        text: args.body.slice(0, 1024),
+      },
+      action: {
+        buttons,
+      },
     },
   });
 }
