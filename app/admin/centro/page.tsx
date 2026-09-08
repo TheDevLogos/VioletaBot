@@ -323,13 +323,6 @@ export default async function OperationCenter({
           <div className="opActions">
             <Link
               className="opBtn secondary"
-              href="/admin/analitica"
-            >
-              Analítica preventiva
-            </Link>
-
-            <Link
-              className="opBtn secondary"
               href="/admin/canalizaciones"
             >
               Ver canalizaciones
