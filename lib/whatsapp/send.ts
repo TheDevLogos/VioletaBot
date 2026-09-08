@@ -4,21 +4,50 @@ function graphVersion() {
 
 function whatsappToken() {
   const token = process.env.WHATSAPP_ACCESS_TOKEN;
-  if (!token) throw new Error('WHATSAPP_ACCESS_TOKEN not configured');
+
+  if (!token) {
+    throw new Error('WHATSAPP_ACCESS_TOKEN not configured');
+  }
+
   return token;
 }
 
-async function graphPost(phoneNumberId: string, payload: unknown) {
-  const r = await fetch(`https://graph.facebook.com/${graphVersion()}/${phoneNumberId}/messages`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${whatsappToken()}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
+function normalizeWhatsAppRecipient(value: string) {
+  const digits = value.replace(/\D/g, '');
+
+  // WhatsApp puede entregar números mexicanos como 521XXXXXXXXXX,
+  // mientras Cloud API espera actualmente 52XXXXXXXXXX.
+  if (/^521\d{10}$/.test(digits)) {
+    return `52${digits.slice(3)}`;
+  }
+
+  return digits;
+}
+
+async function graphPost(
+  phoneNumberId: string,
+  payload: unknown
+) {
+  const r = await fetch(
+    `https://graph.facebook.com/${graphVersion()}/${phoneNumberId}/messages`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${whatsappToken()}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+
   const data = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(`WhatsApp error ${r.status}: ${JSON.stringify(data).slice(0, 500)}`);
+
+  if (!r.ok) {
+    throw new Error(
+      `WhatsApp error ${r.status}: ${JSON.stringify(data).slice(0, 500)}`
+    );
+  }
+
   return data;
 }
 
@@ -27,13 +56,18 @@ export async function sendWhatsApp(
   body: string,
   phoneNumberId?: string | null
 ) {
-  const id = phoneNumberId || process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const id =
+    phoneNumberId ||
+    process.env.WHATSAPP_PHONE_NUMBER_ID;
 
   if (!id) {
-    throw new Error('WhatsApp phone number ID not configured');
+    throw new Error(
+      'WhatsApp phone number ID not configured'
+    );
   }
 
-  const recipient = normalizeWhatsAppRecipient(to);
+  const recipient =
+    normalizeWhatsAppRecipient(to);
 
   return graphPost(id, {
     messaging_product: 'whatsapp',
@@ -47,23 +81,16 @@ export async function sendWhatsApp(
   });
 }
 
-export async function sendTypingAndRead(messageId: string, phoneNumberId: string) {
+export async function sendTypingAndRead(
+  messageId: string,
+  phoneNumberId: string
+) {
   return graphPost(phoneNumberId, {
     messaging_product: 'whatsapp',
     status: 'read',
     message_id: messageId,
-    typing_indicator: { type: 'text' },
+    typing_indicator: {
+      type: 'text',
+    },
   });
-}
-
-function normalizeWhatsAppRecipient(value: string) {
-  const digits = value.replace(/\D/g, '');
-
-  // WhatsApp puede entregar algunos números mexicanos como 521XXXXXXXXXX,
-  // mientras Cloud API espera el E.164 actual 52XXXXXXXXXX.
-  if (/^521\d{10}$/.test(digits)) {
-    return `52${digits.slice(3)}`;
-  }
-
-  return digits;
 }
